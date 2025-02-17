@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var isSidebarOpened = false //Check if the sidebar is opened
+    @State private var isNotificationtabOpened = false //Check if the notification is opened
     
     var body: some View {
         NavigationStack {
@@ -20,6 +21,14 @@ struct ContentView: View {
                     Sidebar(isSidebarVisible: $isSidebarOpened)
                         .frame(width: 400)
                         .transition(.move(edge: .leading))
+                }
+                
+                //Notificationtab
+                if isNotificationtabOpened {
+                    Spacer()
+                    Notificationtab(isNotificationtabVisible: $isNotificationtabOpened)
+                        .frame(width: 400)
+                        .transition(.move(edge: .trailing))
                 }
                 
                 // Main Content
@@ -38,9 +47,26 @@ struct ContentView: View {
                                 .clipShape(Circle())
                         }
                             .offset(x: isSidebarOpened ? 320 : 0)
+                            .opacity(isNotificationtabOpened ? 0 : 1)
                             .padding(), alignment: .topLeading
                     )
-                
+                    .overlay(
+                        Button(action: {
+                            withAnimation {
+                                isNotificationtabOpened.toggle()
+                            }
+                        }) {
+                            Image(systemName: isNotificationtabOpened ? "chevron.right" : "bell.fill")
+                                .foregroundStyle(.pink)
+                                .padding()
+                                .background(Color.gray.opacity(0.2))
+                                .clipShape(Circle())
+                        }
+                            .offset(x: isNotificationtabOpened ? 0 : 320)
+                            .opacity(isSidebarOpened ? 0 : 1)
+                            .padding(), alignment: .topLeading
+                            
+                    )
                 //Homepage Content
                 Home()
                     .opacity(isSidebarOpened ? 0.1 : 1)
