@@ -50,13 +50,13 @@ struct Sidebar: View {
             UserProfile()
             ForEach(menuItems) { item in
                 Button(action: {
-                    
                 }) {
                     HStack {
                         Image(systemName: item.icon)
                         Text(item.text)
                             .font(.title)
                             .padding(.vertical, 5)
+                            
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 5)
@@ -66,6 +66,7 @@ struct Sidebar: View {
             
             Spacer()
         }
+        .foregroundStyle(.pink)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .background(Color.gray.opacity(0.4))
     }
