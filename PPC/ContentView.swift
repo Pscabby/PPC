@@ -40,6 +40,10 @@ struct ContentView: View {
                         .offset(x: isSidebarOpened ? 320 : 0)
                         .padding(), alignment: .topLeading
                 )
+            
+            //Homepage Content
+            Home()
+                .opacity(isSidebarOpened ? 0.1 : 1)
         }
         
     }
