@@ -41,6 +41,7 @@ class TimerManager: ObservableObject {
 struct Home: View {
     @State private var breathCount = 0
     @StateObject private var timerManager = TimerManager()
+    @Binding var isToolbarVisible: Bool
     
     struct ToolbarItem: Identifiable {
         var id: Int
@@ -129,6 +130,7 @@ struct Home: View {
                                 }
                             }
                             .frame(maxWidth: .infinity)
+                            .opacity(isToolbarVisible ? 1 : 0.1)
                         }
                     }
                 }
@@ -158,5 +160,5 @@ struct TimerView: View {
 }
 
 #Preview {
-    Home()
+    Home(isToolbarVisible: .constant(true))
 }
