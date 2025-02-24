@@ -42,27 +42,29 @@ struct Home: View {
     @State private var breathCount = 0
     @StateObject private var timerManager = TimerManager()
     @Binding var isToolbarVisible: Bool
+    @State private var selectedToolbarItem: Int? = nil //Check which button been clicked
+    @State private var isRest = true
     
     struct ToolbarItem: Identifiable {
         var id: Int
         var icon: String
         var text: String
     }
-
-    var isRest = true
+    
+    
     let mainColor = Color(red: 255/255, green: 105/255, blue: 161/255, opacity: 1)
-
+    
     let toolbarItems: [ToolbarItem] = [
         ToolbarItem(id: 2001, icon: "moon.zzz", text: "睡眠中"),
         ToolbarItem(id: 2002, icon: "lungs.fill", text: "呼吸費力"),
         ToolbarItem(id: 2003, icon: "square.and.arrow.down.fill", text: "儲存")
     ]
-
+    
     var body: some View {
         NavigationStack {
             VStack {
                 ZStack {
-                    TimerView(timerManager: timerManager)
+                    TimerView(timerManager: timerManager, isRest: $isRest)
                     
                     Button(action: {
                         if !timerManager.isRunning {
@@ -91,7 +93,7 @@ struct Home: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-
+                    
                     VStack {
                         Text(isRest ? "休息時" : "費力時")
                         Text("呼吸速率")
@@ -101,7 +103,7 @@ struct Home: View {
                     .font(.title)
                     .foregroundStyle(.pink)
                     .frame(maxWidth: .infinity)
-
+                    
                     Button {
                         timerManager.pauseTimer()
                     } label: {
@@ -121,7 +123,8 @@ struct Home: View {
                     HStack {
                         ForEach(toolbarItems) { item in
                             Button {
-                                
+                                selectedToolbarItem = item.id
+                                handleToolbarAction(item.id, isRest: $isRest)
                             } label: {
                                 VStack {
                                     Image(systemName: item.icon)
@@ -143,21 +146,53 @@ struct Home: View {
 // 60s Timer
 struct TimerView: View {
     @ObservedObject var timerManager: TimerManager
+    @Binding var isRest: Bool  // Add isRest as a Binding
+    @State private var lineWidth = 15
+    @State private var lineColor = Color.pink
+    
+//    let darkPink: Color = Color(red: 211, green: 15, blue: 69, opacity: 1)
+    let darkPink: Color = Color(red: 211/255, green: 15/255, blue: 69/255)
     let totalTime: CGFloat = 60
-
+    
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.gray.opacity(0.3), lineWidth: 15)
+                .stroke(Color.gray.opacity(0.3), lineWidth: CGFloat(lineWidth))
             Circle()
                 .trim(from: 0, to: 1 - timerManager.timeRemaining / totalTime)
-                .stroke(Color.pink, lineWidth: 15)
+                .stroke(lineColor, lineWidth: CGFloat(lineWidth))
                 .rotationEffect(.degrees(-90))
                 .animation(.linear(duration: 1), value: timerManager.timeRemaining)
         }
         .frame(width: 350, height: 350)
+        .onChange(of: isRest) {
+            lineWidth = isRest ? 15 : 30 // Change lineWidth based on isRest
+            lineColor = isRest ? darkPink : Color.pink
+        }
     }
 }
+
+func handleToolbarAction(_ id: Int, isRest: Binding<Bool>) {
+    switch id {
+    case 2001:
+        // Handle sleep mode action here
+        if !isRest.wrappedValue {  // Only toggle if isRest is true
+            isRest.wrappedValue.toggle()
+        }
+    case 2002:
+        // Handle breathing difficulty action here
+        if isRest.wrappedValue {  // Only toggle if isRest is false
+            isRest.wrappedValue.toggle()
+        }
+    case 2003:
+        print("儲存 button clicked")
+        // Handle save action here
+    default:
+        break
+    }
+}
+
+
 
 #Preview {
     Home(isToolbarVisible: .constant(true))
